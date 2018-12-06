@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 using System.Net.Sockets;
@@ -12,7 +6,6 @@ using System.Net;
 
 using ChatApplication;
 using System.IO;
-using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -69,7 +62,7 @@ namespace ChatClient
             }
         }
 
-        //Property for the acknowledgement with an event handler to detect changes made to the value.
+        //Property for the sequence number with an event handler to detect changes made to the value.
         public int ReceivedSeq
         {
             get { return receivedSeq; }
@@ -89,7 +82,6 @@ namespace ChatClient
 
         private byte[] dataStream = new byte[packetSize];
 
-        // Used to update the application display window
         private delegate void DisplayMessageDelegate(string message);
         private DisplayMessageDelegate displayMessageDelegate = null;
 
@@ -396,7 +388,6 @@ namespace ChatClient
                     // Send packet to the server
                     this.clientSocket.SendTo(byteData, 0, byteData.Length, SocketFlags.None, endPointServer);
 
-                    // Close the socket
                     this.clientSocket.Close();
                 }
             }
@@ -416,28 +407,18 @@ namespace ChatClient
                 sendData.Message = null;
                 sendData.ClientDataIdentifier = DataIdentifier.LogIn;
 
-                // Initialise socket
                 this.clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-                // Initialise server IP
                 IPAddress serverIP = IPAddress.Parse(txtServerIP.Text.Trim());
-
-                // Initialise the IPEndPoint for the server and use port 30000
                 IPEndPoint server = new IPEndPoint(serverIP, 30000);
-
-                // Initialise the EndPoint for the server
                 endPointServer = (EndPoint)server;
 
                 // Get packet as byte array
                 byte[] data = sendData.GetDataStream();
 
-                // Send data to server
                 clientSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, endPointServer, new AsyncCallback(this.SendData), null);
 
-                // Initialise data stream
                 this.dataStream = new byte[packetSize];
 
-                // Begin listening for broadcasts
                 clientSocket.BeginReceiveFrom(this.dataStream, 0, this.dataStream.Length, SocketFlags.None, ref endPointServer, new AsyncCallback(this.ReceiveData), null);
             }
             catch (Exception ex)

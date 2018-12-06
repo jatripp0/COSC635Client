@@ -4,12 +4,7 @@ using System.Text;
 
 namespace ChatApplication
 {
-    // ----------------
-    // Packet Structure
-    // ----------------
 
-    // Description   -> |dataIdentifier|name length|message length|    name   |    message   |
-    // Size in bytes -> |       4      |     4     |       4      |name length|message length|
     public enum DataIdentifier
     {
         Message,
@@ -67,6 +62,7 @@ namespace ChatApplication
         public String WindowSize
         {
             get { return windowSize; }
+            set { windowSize = value; }
         }
         #endregion
 
