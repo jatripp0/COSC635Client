@@ -7,3 +7,4 @@ C:\Users\jatripp0\Downloads\ChatClient\ChatClient\ChatClient\obj\Debug\ChatClien
 C:\Users\jatripp0\Downloads\ChatClient\ChatClient\ChatClient\obj\Debug\ChatClient.csproj.CoreCompileInputs.cache
 C:\Users\jatripp0\Downloads\ChatClient\ChatClient\ChatClient\obj\Debug\ChatClient.exe
 C:\Users\jatripp0\Downloads\ChatClient\ChatClient\ChatClient\obj\Debug\ChatClient.pdb
+C:\Users\jatripp0\Downloads\ChatClient\ChatClient\ChatClient\bin\Debug\ChatClient.exe.config

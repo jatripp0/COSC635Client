@@ -26,8 +26,10 @@ namespace ChatApplication
         private string ack;
         private string algorithm;
         private string windowSize;
-        private string message;
+        private byte[] message;
         private string sequenceNum;
+        private static int messageSize = 1000;
+        private static int packetSize = 1024;
         #endregion
 
         #region Public Properties
@@ -38,7 +40,7 @@ namespace ChatApplication
             set { dataIdentifier = value; }
         }
 
-        public string Message
+        public byte[] Message
         {
             get { return message; }
             set { message = value; }
@@ -73,7 +75,7 @@ namespace ChatApplication
         // Default Constructor
         public Packet()
         {
-            this.message = null;
+            this.message = new byte[messageSize];
             this.ack = "0";
             this.algorithm = "0";
             this.windowSize = "0";
@@ -84,20 +86,22 @@ namespace ChatApplication
         {
             this.dataIdentifier = (DataIdentifier)BitConverter.ToInt32(dataStream, 0);
 
-            int sequenceNum = BitConverter.ToInt32(dataStream, 4);
+            this.sequenceNum = BitConverter.ToInt32(dataStream, 4).ToString();
 
-            int ack = BitConverter.ToInt32(dataStream, 8);
+            this.ack = BitConverter.ToInt32(dataStream, 8).ToString();
 
-            int algorithm = BitConverter.ToInt32(dataStream, 12);
+            this.algorithm = BitConverter.ToInt32(dataStream, 12).ToString();
 
-            int windowSize = BitConverter.ToInt32(dataStream, 16);
+            this.windowSize = BitConverter.ToInt32(dataStream, 16).ToString();
 
             // Read the length of the message (4 bytes)
             int msgLength = BitConverter.ToInt32(dataStream, 20);
 
             // Read the message field
-            if (msgLength > 0)
-                this.message = Encoding.UTF8.GetString(dataStream, 24, msgLength);
+            if (msgLength > 0) {
+                this.message = new byte[messageSize];
+                Buffer.BlockCopy(dataStream, 24, message, 0, dataStream.Length - 24);
+            }
             else
                 this.message = null;
         }
@@ -110,22 +114,22 @@ namespace ChatApplication
             dataStream.AddRange(BitConverter.GetBytes((int)this.dataIdentifier));
 
             if (this.message != null)
-                dataStream.AddRange(BitConverter.GetBytes(this.sequenceNum.Length));
+                dataStream.AddRange(BitConverter.GetBytes(Convert.ToInt32(this.sequenceNum)));
             else
                 dataStream.AddRange(BitConverter.GetBytes(0));
 
             if (this.message != null)
-                dataStream.AddRange(BitConverter.GetBytes(this.ack.Length));
+                dataStream.AddRange(BitConverter.GetBytes(Convert.ToInt32(this.ack)));
             else
                 dataStream.AddRange(BitConverter.GetBytes(0));
 
             if (this.message != null)
-                dataStream.AddRange(BitConverter.GetBytes(this.algorithm.Length));
+                dataStream.AddRange(BitConverter.GetBytes(Convert.ToInt32(this.algorithm)));
             else
                 dataStream.AddRange(BitConverter.GetBytes(0));
 
             if (this.message != null)
-                dataStream.AddRange(BitConverter.GetBytes(this.windowSize.Length));
+                dataStream.AddRange(BitConverter.GetBytes(Convert.ToInt32(this.windowSize)));
             else
                 dataStream.AddRange(BitConverter.GetBytes(0));
 
@@ -137,7 +141,7 @@ namespace ChatApplication
 
             // Add the message
             if (this.message != null)
-                dataStream.AddRange(Encoding.UTF8.GetBytes(this.message));
+                dataStream.AddRange(this.message);
 
             return dataStream.ToArray();
         }
